@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const imageSchema = new mongoose.Schema({
     name: {
@@ -11,8 +11,8 @@ const imageSchema = new mongoose.Schema({
     },
     isResized: {
         type: Boolean,
-        default: false
+        default: false,
     },
 });
 
-module.exports = mongoose.model('Image', imageSchema);
+export default mongoose.model('Image', imageSchema);

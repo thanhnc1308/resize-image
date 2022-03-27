@@ -1,5 +1,5 @@
-const Image = require('./Image');
-const CONST = require('./constants');
+import Image from './Image.js';
+import { OLD_S3_HOST } from './constants.js';
 
 function generateMockImage() {
     const COUNT = 5;
@@ -7,14 +7,14 @@ function generateMockImage() {
     for (let i = 0; i < COUNT; i++) {
         const image = {
             name: `image_${i}.png`,
-            url: `${CONST.OLD_S3_HOST}/image_${i}.png`,
+            url: `${OLD_S3_HOST}/image_${i}.png`,
         };
         images.push(image);
     }
     return images;
 }
 
-module.exports.generateMockImageData = function () {
+export function generateMockImageData () {
     const images = generateMockImage();
     Image.collection.insertMany(images, function (err, docs) {
         if (err) {
