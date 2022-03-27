@@ -5,15 +5,61 @@ import {
     MONGODB_CONNECTION_STRING,
     OLD_S3_HOST,
     NEW_S3_HOST,
-} from './constants.js';
+    OLD_BUCKET,
+    NEW_BUCKET,
+    TEMP_FOLDER,
+} from './config.js';
+import { createObject, getObject } from './AWSS3Provider.js';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+/**
+ * Get the upload param for PutObjectCommand
+ */
+function getUploadParams(fileName) {
+    const filePath = path.join(fileName);
+    const fileStream = fs.createReadStream(filePath);
+    return {
+        Bucket: NEW_BUCKET,
+        Key: path.basename(file),
+        Body: fileStream,
+    };
+}
+
+function createTempFolder() {
+    const dir = path.join(__dirname, TEMP_FOLDER);
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir);
+    }
+}
+
+function saveFile(readStream, fileName) {
+    const filePath = path.join(__dirname, TEMP_FOLDER, fileName);
+    const writeStream = fs.createWriteStream(filePath);
+    readStream.pipe(writeStream);
+}
 
 async function main() {
-    await connect();
+    const imageStream = await getObject({
+        Bucket: OLD_BUCKET,
+        Key: 'Screenshot-from-2022-03-26-23-21-55.png',
+    });
+    saveFile(imageStream, 'test1.png')
+    // const image = await getObject({
+    //     Bucket: OLD_BUCKET,
+    //     Key: 'Screenshot-from-2022-03-26-23-21-55.png',
+    // });
+    // createTempFolder();
+    // await connect();
     // mock.generateMockImageData();
-    const listImages = await getListImages();
-    for (const image of listImages) {
-        await processImage(image);
-    }
+    // const listImages = await getListImages();
+    // for (const image of listImages) {
+    //     await processImage(image);
+    // }
 }
 
 async function connect() {

@@ -1,5 +1,5 @@
 import Image from './Image.js';
-import { OLD_S3_HOST } from './constants.js';
+import { OLD_S3_HOST } from './config.js';
 
 function generateMockImage() {
     const COUNT = 5;
