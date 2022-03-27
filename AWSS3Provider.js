@@ -32,14 +32,14 @@ export const createObject = async (params) => {
     // Create an object and upload it to the Amazon S3 bucket.
     try {
         const results = await s3Client.send(new PutObjectCommand(params));
-        console.log(
-            'Successfully created ' +
-                params.Key +
-                ' and uploaded it to ' +
-                params.Bucket +
-                '/' +
-                params.Key
-        );
+        // console.log(
+        //     'Successfully created ' +
+        //         params.Key +
+        //         ' and uploaded it to ' +
+        //         params.Bucket +
+        //         '/' +
+        //         params.Key
+        // );
         return results; // For unit tests.
     } catch (err) {
         console.log('Error', err);
@@ -53,27 +53,22 @@ export const createObject = async (params) => {
     Bucket: 'BUCKET_NAME', // The name of the bucket. For example, 'sample_bucket_101'.
     Key: 'KEY', // The name of the object. For example, 'sample_upload.txt'.
 };
- * @returns ReadStream
+ * @returns Buffer
  */
 export const getObject = async (params) => {
     // Create an object and upload it to the Amazon S3 bucket.
     try {
-        // Create a helper function to convert a ReadableStream to a string.
-        const streamToString = (stream) =>
+        // Create a helper function to convert a ReadableStream to a Buffer.
+        const streamToBuffer = (stream) =>
             new Promise((resolve, reject) => {
                 const chunks = [];
                 stream.on('data', (chunk) => chunks.push(chunk));
                 stream.on('error', reject);
-                stream.on('end', () =>
-                    resolve(Buffer.concat(chunks).toString('binary'))
-                );
+                stream.on('end', () => resolve(Buffer.concat(chunks)));
             });
         const result = await s3Client.send(new GetObjectCommand(params));
-        return result.Body;
-        // Convert the ReadableStream to a string.
-        // const bodyContents = await streamToString(result.Body);
-        // return bodyContents;
-
+        // return result.Body;
+        return await streamToBuffer(result.Body);
     } catch (err) {
         console.log('Error', err);
         return null;
