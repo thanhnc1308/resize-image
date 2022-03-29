@@ -2,11 +2,11 @@ import Image from './Image.js';
 import { OLD_S3_HOST } from './config.js';
 
 function generateMockImage() {
-    const COUNT = 5;
+    const COUNT = 50;
     const images = [];
     for (let i = 0; i < COUNT; i++) {
         const image = {
-            name: `image_${i}.png`,
+            name: `image1.png`,
             url: `${OLD_S3_HOST}/image_${i}.png`,
         };
         images.push(image);
@@ -14,14 +14,12 @@ function generateMockImage() {
     return images;
 }
 
-export function generateMockImageData () {
+async function clearData() {
+    await Image.collection.deleteMany();
+}
+
+export async function generateMockImageData() {
+    await clearData();
     const images = generateMockImage();
-    Image.collection.insertMany(images, function (err, docs) {
-        if (err) {
-            console.log(err);
-        } else {
-            console.log('Successful');
-        }
-        // console.log(docs);
-    });
-};
+    await Image.collection.insertMany(images);
+}

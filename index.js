@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import Image from './Image.js';
-// import mock from './mock.js';
+import { generateMockImageData } from './mock.js';
 import {
     MONGODB_CONNECTION_STRING,
     OLD_S3_HOST,
@@ -11,17 +11,19 @@ import {
 } from './config.js';
 import { createObject, getObject } from './AWSS3Provider.js';
 import sharp from 'sharp';
+import { performance } from 'perf_hooks';
 
 async function main() {
     await connect();
-    // mock.generateMockImageData();
-    console.time('reduce_image');
+    await generateMockImageData();
+    const start = performance.now();
     while (await checkExistsRawImages()) {
         const listImages = await getListImages();
-        console.log('listImages.length:', listImages.length);
-        processMultipleTask(listImages);
+        // await processSingleTask(listImages);
+        await processMultipleTask(listImages);
     }
-    console.timeEnd('reduce_image');
+    const end = performance.now();
+    console.log(`Time: ${end - start}ms`);
 }
 
 async function connect() {
